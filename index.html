@@ -67,6 +67,7 @@ th{color:var(--soft);font-size:.8rem;font-weight:600}td.act{text-align:right;whi
 .msg.error{background:var(--red-soft);color:var(--red)}.msg.ok{background:var(--ok-soft);color:var(--ok)}.msg.info{background:#FFF4D6;color:#6B4E00}
 .acta{background:#fff;border:1px solid var(--line);border-radius:6px;padding:36px;font-size:.93rem}
 .acta .head{text-align:center}.acta .head .seal{margin:0 auto 8px}
+.acta{-webkit-print-color-adjust:exact;print-color-adjust:exact}.acta .stats{margin:14px 0}.acta .bar-row.win{background:#FFF4D6;border:2px solid var(--gold);border-radius:12px;padding:10px}.acta .bar-row{padding:4px 0;break-inside:avoid}.acta .logo.big{width:56px;height:56px}
 .acta .ref{text-align:right;font-size:.78rem;color:var(--soft)}
 .acta h2{font-size:1.2rem;margin-bottom:2px}.acta .sub{color:var(--soft);font-size:.88rem;margin-bottom:20px}
 .acta hr{border:none;border-top:1px solid var(--line);margin:16px 0}
@@ -189,7 +190,7 @@ th{color:var(--soft);font-size:.8rem;font-weight:600}td.act{text-align:right;whi
     </div>
 
     <div id="tab-resultados" class="hidden">
-      <div class="card"><h2>Resultados en vivo</h2><div class="stats" id="stats"></div><div id="integrity"></div><div id="resBars"></div></div>
+      <div class="card"><h2>Resultados en vivo</h2><div class="stats" id="stats"></div><button class="btn accent" id="btnClose2" style="margin:0 0 14px">Cerrar votación y ver acta de resultados</button><div id="integrity"></div><div id="resBars"></div></div>
     </div>
 
     <div id="tab-actas" class="hidden">
@@ -332,10 +333,9 @@ function renderAdmin(){
   $('ctlTag').textContent = lbl; $('ctlTag').className = 'tag ' + cls;
   $('ctlInfo').textContent = st === 'setup' ? (urna.length ? 'Hay votos de un proceso anterior: reinicia el proceso antes de abrir.' : 'Registra las listas y el padrón antes de abrir la votación.')
     : st === 'open' ? 'Abierta desde: ' + fecha(config.openedAt) : 'Cerrada: ' + fecha(config.closedAt) + '. Puedes reabrirla si fue un error.';
-  $('btnOpen').classList.toggle('hidden', st !== 'setup');
-  $('btnClose').classList.toggle('hidden', st !== 'open');
-  $('btnReopen').classList.toggle('hidden', st !== 'closed');
-  $('btnOpen').disabled = !(config.candidates.length && padron.length && !urna.length);
+  $('btnOpen').disabled = !(st === 'setup' && config.candidates.length && padron.length && !urna.length);
+  $('btnClose').disabled = st !== 'open'; $('btnClose2').disabled = st !== 'open';
+  $('btnReopen').disabled = st !== 'closed';
 
   const voted = padron.filter(p => p.voted).length;
   $('stats').innerHTML = [[padron.length, 'Estudiantes hábiles'], [voted, 'Ya votaron'], [Math.max(0, padron.length - voted), 'Faltan votar'], [pct(voted, padron.length) + '%', 'Participación']].map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
@@ -504,7 +504,11 @@ $('candTable').onclick = async e => {
 
 // ---- Control ----
 $('btnOpen').onclick = () => { if (confirm('¿Abrir la votación? Podrás seguir corrigiendo datos mientras esté abierta.')) saveCfg({ status: 'open', openedAt: Date.now(), closedAt: null }); };
-$('btnClose').onclick = () => { if (confirm('¿Cerrar la votación? Los estudiantes ya no podrán votar.')) saveCfg({ status: 'closed', closedAt: Date.now() }); };
+$('btnClose').onclick = $('btnClose2').onclick = async () => {
+  if (!confirm('¿Cerrar la votación? Los estudiantes ya no podrán votar.')) return;
+  await saveCfg({ status: 'closed', closedAt: Date.now() });
+  document.querySelector('[data-tab="actas"]').click(); showActa(buildEscrutinio());
+};
 $('btnReopen').onclick = () => { if (confirm('¿Reabrir la votación? Los votos ya emitidos se conservan.')) saveCfg({ status: 'open', closedAt: null }); };
 $('btnReset').onclick = async () => {
   if (prompt('Esto borra padrón, listas y votos. Imprime antes el acta de escrutinio. Escribe REINICIAR para confirmar:') !== 'REINICIAR') return;
@@ -541,11 +545,17 @@ function resultText(t){
 function buildEscrutinio(){
   const t = tally(), hab = padron.length;
   const rows = config.candidates.map(x => [x.lista + ': ' + x.name, t.c[x.id] || 0]).concat([['Voto en blanco', t.blank]]);
-  return `<div class="acta">${actaHead('Acta de escrutinio')}
+  const closed = config.status === 'closed', mx = Math.max(0, ...config.candidates.map(x => t.c[x.id] || 0));
+  const chart = config.candidates.map(x => ({ ...x, n: t.c[x.id] || 0 })).concat([{ id:'_b', lista:'', name:'Voto en blanco', n:t.blank }]).map(c => {
+    const win = closed && mx && c.id !== '_b' && c.n === mx, p = pct(c.n, t.total);
+    return `<div class="bar-row ${win ? 'win' : ''}">${c.id === '_b' ? '<div class="logo big">—</div>' : logoBox(c, true)}<div><div class="bar-label"><span>${esc(c.lista)}${c.lista ? ': ' : ''}${esc(c.name)}${win ? ' ★ Ganadora' : ''}</span><span>${c.n} voto(s), ${p}%</span></div><div class="bar-track"><div class="bar-fill ${c.id === '_b' ? 'blank' : ''}" style="width:${p}%"></div></div></div></div>`;
+  }).join('');
+  return `<div class="acta">${actaHead(config.status === 'closed' ? 'Acta de escrutinio' : 'Acta de escrutinio (resultados parciales)')}
   <p>Siendo las <strong>${config.closedAt ? fecha(config.closedAt) : '[pendiente de cierre]'}</strong>, se realiza el escrutinio de los votos emitidos en la elección del Municipio Escolar.</p><hr>
-  <p><strong>Estudiantes hábiles:</strong> ${hab} &nbsp;|&nbsp; <strong>Votos emitidos:</strong> ${t.total} &nbsp;|&nbsp; <strong>Participación:</strong> ${pct(t.total, hab)}%</p>
+  <div class="stats">${[[hab, 'Estudiantes hábiles'], [t.total, 'Votos emitidos'], [pct(t.total, hab) + '%', 'Participación']].map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('')}</div>
+  <div style="margin:18px 0 6px">${chart}</div>
   <table><thead><tr><th>Opción</th><th>Votos</th><th>%</th></tr></thead><tbody>${rows.map(([n, v]) => `<tr><td>${esc(n)}</td><td>${v}</td><td>${pct(v, t.total)}%</td></tr>`).join('')}</tbody></table><hr>
-  <p><strong>Resultado:</strong> ${config.status === 'closed' ? resultText(t) : 'La votación aún no ha sido cerrada oficialmente.'}</p>${firmas}</div>`;
+  <p><strong>Resultado:</strong> ${config.status === 'closed' ? resultText(t) : 'La votación sigue abierta: estas cifras son parciales y no son definitivas. Cierra la votación para generar el acta oficial.'}</p>${firmas}</div>`;
 }
 const showActa = html => { $('actaBox').innerHTML = html; $('printRow').classList.remove('hidden'); };
 $('btnBorrador').onclick = () => showActa(buildBorrador());
