@@ -3,91 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Votación Municipio Escolar</title>
-<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Elecciones del Municipio Escolar</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#F5F3EE;--ink:#16233F;--soft:#57627A;--accent:#A31621;--accent-soft:#F1DEDE;--line:#D7D1C2;--panel:#fff;--ok:#2F6846;--ok-soft:#E1EEE5}
+:root{--bg:#E9EDF4;--ink:#0F1E3D;--soft:#5A6580;--red:#B5121B;--red-soft:#F8E3E4;--gold:#C79A2B;--line:#D3DAE6;--panel:#fff;--ok:#1E6B45;--ok-soft:#DDF1E6}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif}
-h1,h2,h3{font-family:'Lora',serif;margin:0}
-.app{max-width:1020px;margin:0 auto;padding:24px 20px 60px}
-header.top{display:flex;align-items:center;gap:16px;border-bottom:3px double var(--ink);padding-bottom:16px;margin-bottom:26px}
-.seal{width:52px;height:52px;border-radius:50%;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font:700 1rem 'Lora',serif;background:#fff;flex-shrink:0}
-.titles{flex:1}.titles h1{font-size:1.35rem}.inst{font-size:.82rem;color:var(--soft);margin-top:2px}
-nav.roles{display:flex;gap:10px;margin-bottom:24px}
-nav.roles button{flex:1;padding:12px;border:1.5px solid var(--line);background:var(--panel);border-radius:6px;font:600 .9rem 'Inter';color:var(--soft);cursor:pointer}
-nav.roles button.active{border-color:var(--ink);color:var(--ink)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Figtree',sans-serif;line-height:1.45}
+h1,h2,h3{font-family:'Bricolage Grotesque',sans-serif;margin:0}
+.app{max-width:1000px;margin:0 auto;padding:0 16px 60px}
+header.top{background:var(--ink);color:#fff;margin:0 -16px 26px;padding:18px 24px;display:flex;align-items:center;gap:16px;border-bottom:4px solid var(--gold)}
+@media(min-width:1040px){header.top{margin:0 0 26px;border-radius:0 0 14px 14px}}
+.seal{width:64px;height:64px;border-radius:50%;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;font:800 1.2rem 'Bricolage Grotesque';flex-shrink:0;overflow:hidden;border:3px solid var(--gold)}
+.seal img,.logo img{width:100%;height:100%;object-fit:contain}
+.titles{flex:1}.titles h1{font-size:1.45rem;line-height:1.15}.inst{font-size:.9rem;opacity:.8;margin-top:3px}
+.tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700}
+.tag.open{background:var(--ok-soft);color:var(--ok)}.tag.closed{background:var(--red-soft);color:var(--red)}.tag.setup{background:#E4E8F0;color:var(--soft)}
+nav.roles{display:flex;gap:8px;margin-bottom:22px}
+nav.roles button{flex:1;padding:12px;border:1.5px solid var(--line);background:var(--panel);border-radius:10px;font:600 .9rem 'Figtree';color:var(--soft);cursor:pointer}
+nav.roles button.active{border-color:var(--ink);background:var(--ink);color:#fff}
 .hidden{display:none!important}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:22px;margin-bottom:20px}
-.card h2{font-size:1.1rem;margin-bottom:14px}.card h3{font-size:.95rem;margin:18px 0 8px}
-label{display:block;font-size:.8rem;color:var(--soft);margin:12px 0 4px;font-weight:600}
-input,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:5px;font:.93rem 'Inter';background:#fff;color:var(--ink)}
-textarea{min-height:80px;resize:vertical;font-family:monospace;font-size:.83rem}
+.card{background:var(--panel);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 1px 3px rgba(15,30,61,.08)}
+.card h2{font-size:1.15rem;margin-bottom:12px}
+label{display:block;font-size:.82rem;color:var(--soft);margin:12px 0 4px;font-weight:600}
+input,textarea{width:100%;padding:11px;border:1.5px solid var(--line);border-radius:8px;font:.95rem 'Figtree';background:#fff;color:var(--ink)}
+input:focus,textarea:focus{outline:none;border-color:var(--ink)}
+textarea{min-height:80px;resize:vertical}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}.row>*{flex:1;min-width:140px}
-.btn{padding:10px 18px;border:none;border-radius:5px;font:600 .88rem 'Inter';cursor:pointer;background:var(--ink);color:#fff;margin-top:14px}
+.btn{padding:11px 18px;border:none;border-radius:8px;font:700 .9rem 'Figtree';cursor:pointer;background:var(--ink);color:#fff;margin-top:14px}
 .btn.secondary{background:#fff;color:var(--ink);border:1.5px solid var(--ink)}
-.btn.accent{background:var(--accent)}
-.btn.small{padding:6px 10px;font-size:.78rem;margin:0}
-.btn.link{background:none;color:var(--soft);text-decoration:underline;padding:0;margin:0;font-size:.78rem}
-.btn:disabled,input:disabled,textarea:disabled{opacity:.5;cursor:not-allowed}
-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:.88rem}
-th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
-th{color:var(--soft);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
-.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700}
-.tag.open{background:var(--ok-soft);color:var(--ok)}.tag.closed{background:var(--accent-soft);color:var(--accent)}.tag.setup{background:#ECE8DE;color:var(--soft)}
-.tabs{display:flex;gap:4px;border-bottom:1.5px solid var(--line);margin-bottom:20px;flex-wrap:wrap}
-.tabs button{padding:10px 14px;border:none;background:none;font:600 .86rem 'Inter';color:var(--soft);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px}
-.tabs button.active{color:var(--ink);border-bottom-color:var(--accent)}
-.bar-row{margin-bottom:14px}.bar-label{display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:4px}
-.bar-track{background:#ECE7DA;border-radius:4px;height:14px;overflow:hidden}
-.bar-fill{background:var(--ink);height:100%}.bar-fill.blank{background:var(--soft)}
-.ballot-wrap{max-width:460px;margin:30px auto 0}
-.ballot-card{border:2px solid var(--ink);border-radius:4px;background:#fff;overflow:hidden;box-shadow:0 6px 24px rgba(22,35,63,.08)}
-.ballot-header{background:var(--ink);color:#fff;padding:20px 22px;text-align:center}
-.ballot-header .peru{font-size:.66rem;letter-spacing:.12em;opacity:.75;margin-bottom:6px}
-.ballot-header .instname{font:1.1rem 'Lora',serif}
-.ballot-body{padding:22px}
-.candidate-opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:inherit;border:1.5px solid var(--line);border-radius:5px;padding:12px 14px;margin-bottom:10px;cursor:pointer;background:#fff}
-.candidate-opt:focus-visible{outline:3px solid var(--accent)}
-.candidate-opt.selected{border-color:var(--accent);background:var(--accent-soft)}
-.candidate-opt .num{min-width:28px;height:28px;padding:0 6px;border-radius:14px;border:1.5px solid var(--soft);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700}
-.msg{padding:12px 14px;border-radius:6px;font-size:.86rem;margin-top:12px}
-.msg.error{background:var(--accent-soft);color:var(--accent)}.msg.ok{background:var(--ok-soft);color:var(--ok)}
-.acta{background:#fff;border:1px solid var(--line);padding:34px;font-size:.92rem}
-.acta .ref{text-align:right;font-size:.75rem;color:var(--soft)}
-.acta h2{text-align:center;font-size:1.15rem;margin-bottom:4px}.acta .sub{text-align:center;color:var(--soft);font-size:.84rem;margin-bottom:22px}
+.btn.accent{background:var(--red)}
+.btn.small{padding:6px 11px;font-size:.78rem;margin:0 0 0 4px}
+.btn.link{background:none;color:var(--soft);text-decoration:underline;padding:0;margin:0;font-weight:500}
+.btn:disabled,input:disabled,textarea:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.cand:focus-visible,.tabs button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:.9rem}
+th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{color:var(--soft);font-size:.8rem;font-weight:600}td.act{text-align:right;white-space:nowrap}
+.logo{width:44px;height:44px;border-radius:10px;background:#F1F4F9;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font:700 .85rem 'Bricolage Grotesque';color:var(--soft);overflow:hidden;flex-shrink:0}
+.logo.big{width:62px;height:62px;font-size:1.05rem}
+.upl{display:flex;align-items:center;gap:12px;margin-top:6px}.upl input{padding:8px}
+.tabs{display:flex;gap:4px;border-bottom:1.5px solid var(--line);margin-bottom:18px;flex-wrap:wrap}
+.tabs button{padding:11px 15px;border:none;background:none;font:600 .9rem 'Figtree';color:var(--soft);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1.5px}
+.tabs button.active{color:var(--ink);border-bottom-color:var(--red)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:6px 0 14px}
+.stat{background:#F1F4F9;border-radius:10px;padding:12px}.stat b{display:block;font:800 1.7rem 'Bricolage Grotesque'}.stat span{font-size:.8rem;color:var(--soft)}
+.bar-row{margin-bottom:16px;display:flex;gap:12px;align-items:center}.bar-row>div:last-child{flex:1}
+.bar-label{display:flex;justify-content:space-between;gap:8px;font-size:.92rem;margin-bottom:5px;font-weight:600}
+.bar-track{background:#E4E8F0;border-radius:6px;height:14px;overflow:hidden}
+.bar-fill{background:var(--red);height:100%;border-radius:6px}.bar-fill.blank{background:var(--soft)}
+.ballot-wrap{max-width:480px;margin:10px auto 0}
+.ballot-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 10px 34px rgba(15,30,61,.14);border-top:6px solid var(--red)}
+.ballot-header{padding:24px 22px 16px;text-align:center;border-bottom:2px dashed var(--line)}
+.ballot-header .seal{margin:0 auto 10px;width:84px;height:84px}
+.ballot-header h2{font-size:1.25rem}.ballot-header p{margin:4px 0 0;color:var(--soft);font-size:.9rem}
+.ballot-body{padding:20px 22px 24px}
+.cand{display:flex;align-items:center;gap:14px;width:100%;text-align:left;font:inherit;color:inherit;border:2px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer;background:#fff;position:relative}
+.cand:hover{border-color:var(--soft)}
+.cand.selected{border-color:var(--red);background:var(--red-soft)}
+.cand.selected::after{content:'✔';position:absolute;right:14px;top:50%;transform:translateY(-50%);background:var(--red);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+.cand .lista{font-size:.8rem;color:var(--soft);font-weight:600}.cand strong{font-size:1.02rem}
+.msg{padding:12px 14px;border-radius:8px;font-size:.88rem;margin-top:12px}
+.msg.error{background:var(--red-soft);color:var(--red)}.msg.ok{background:var(--ok-soft);color:var(--ok)}.msg.info{background:#FFF4D6;color:#6B4E00}
+.acta{background:#fff;border:1px solid var(--line);border-radius:6px;padding:36px;font-size:.93rem}
+.acta .head{text-align:center}.acta .head .seal{margin:0 auto 8px}
+.acta{-webkit-print-color-adjust:exact;print-color-adjust:exact}.acta .stats{margin:14px 0}.acta .bar-row.win{background:#FFF4D6;border:2px solid var(--gold);border-radius:12px;padding:10px}.acta .bar-row{padding:4px 0;break-inside:avoid}.acta .logo.big{width:56px;height:56px}
+.acta .ref{text-align:right;font-size:.78rem;color:var(--soft)}
+.acta h2{font-size:1.2rem;margin-bottom:2px}.acta .sub{color:var(--soft);font-size:.88rem;margin-bottom:20px}
 .acta hr{border:none;border-top:1px solid var(--line);margin:16px 0}
-.firmas{display:flex;justify-content:space-between;margin-top:56px}
-.firmas div{width:40%;border-top:1px solid var(--ink);text-align:center;padding-top:6px;font-size:.78rem;color:var(--soft)}
-.small-note{font-size:.76rem;color:var(--soft);margin-top:6px}
-.footer-link{text-align:center;margin-top:34px}
-@media print{nav.roles,.tabs,.no-print,.footer-link{display:none!important}body{background:#fff}.app{padding:0;max-width:100%}}
+.firmas{display:flex;justify-content:space-between;margin-top:60px}
+.firmas div{width:40%;border-top:1px solid var(--ink);text-align:center;padding-top:6px;font-size:.8rem;color:var(--soft)}
+.small-note{font-size:.8rem;color:var(--soft);margin-top:6px}
+.footer-link{text-align:center;margin-top:30px}
+@media print{header.top,nav.roles,.tabs,.no-print,.footer-link{display:none!important}body{background:#fff}.app{padding:0;max-width:100%}.acta{border:none;padding:0}}
 </style>
 </head>
 <body>
 <div class="app">
   <header class="top">
-    <div class="seal">ME</div>
-    <div class="titles"><h1>Municipio Escolar — Sistema de Votación</h1><div class="inst" id="instName">Institución educativa no configurada</div></div>
-    <span class="tag setup" id="statusTag">SIN CONFIGURAR</span>
+    <div class="seal" id="seal">ME</div>
+    <div class="titles"><h1>Elecciones del Municipio Escolar</h1><div class="inst" id="instName">Institución educativa no configurada</div></div>
+    <span class="tag setup" id="statusTag">Sin configurar</span>
   </header>
   <div id="fatal" class="msg error hidden"></div>
 
   <nav class="roles hidden" id="roleNav">
     <button id="btnRoleVote">Vista de votación</button>
-    <button id="btnRoleAdmin" class="active">Panel del comité electoral</button>
+    <button id="btnRoleAdmin" class="active">Panel del comité</button>
     <button id="btnLock" style="flex:0 0 auto">Cerrar sesión</button>
   </nav>
 
-  <!-- VISTA ESTUDIANTE -->
   <div id="viewVote">
     <div class="ballot-wrap" id="stepDni">
       <div class="ballot-card">
-        <div class="ballot-header"><div class="peru">MUNICIPIO ESCOLAR — IDENTIFICACIÓN DEL VOTANTE</div><div class="instname" id="dniInst">Institución educativa</div></div>
+        <div class="ballot-header"><div class="seal" id="dniSeal">ME</div><h2 id="dniInst">Institución educativa</h2><p>Ingresa tu DNI o carné de extranjería para recibir tu cédula</p></div>
         <div class="ballot-body">
-          <label for="dniInput">Ingresa tu N° de DNI o carné de extranjería</label>
-          <input type="text" id="dniInput" placeholder="Ej. 71234567" maxlength="15" inputmode="text" autocapitalize="characters" autocomplete="off">
+          <label for="dniInput">Número de DNI o CE</label>
+          <input type="text" id="dniInput" placeholder="DNI o carné de extranjería" maxlength="15" inputmode="text" autocapitalize="characters" autocomplete="off" style="font-size:1.2rem;text-align:center;letter-spacing:.1em">
           <button class="btn accent" id="btnCheckDni" style="width:100%">Continuar</button>
           <div id="dniMsg"></div>
         </div>
@@ -95,36 +107,34 @@ th{color:var(--soft);font-size:.72rem;text-transform:uppercase;letter-spacing:.0
     </div>
     <div class="ballot-wrap hidden" id="stepVote">
       <div class="ballot-card">
-        <div class="ballot-header"><div class="peru">MUNICIPIO ESCOLAR — CÉDULA DE VOTACIÓN</div><div class="instname" id="ballotInst"></div></div>
+        <div class="ballot-header"><div class="seal" id="ballotSeal">ME</div><h2>Cédula de votación</h2><p id="voterName"></p></div>
         <div class="ballot-body">
-          <p class="small-note" id="voterName" style="margin:0 0 12px"></p>
           <div id="candidateList"></div>
-          <button type="button" class="candidate-opt" id="blankOption"><div class="num">—</div><div><strong>Voto en blanco</strong></div></button>
+          <button type="button" class="cand" id="blankOption"><div class="logo big">—</div><div><strong>Voto en blanco</strong></div></button>
           <button class="btn accent" id="btnConfirmVote" disabled style="width:100%">Confirmar voto</button>
           <div id="voteMsg"></div>
         </div>
       </div>
     </div>
     <div class="ballot-wrap hidden" id="stepDone">
-      <div class="card" style="text-align:center">
-        <h2 style="color:var(--ok)">¡Voto registrado!</h2>
+      <div class="card" style="text-align:center;border-top:6px solid var(--ok)">
+        <h2 style="color:var(--ok);font-size:1.5rem">¡Voto registrado!</h2>
         <p class="small-note">Gracias por participar. Esta pantalla se reiniciará sola.</p>
         <button class="btn secondary" id="btnAgain">Volver al inicio</button>
       </div>
     </div>
     <div class="ballot-wrap hidden" id="loginCard">
       <div class="card">
-        <h2>Acceso del comité electoral</h2>
-        <label for="loginEmail">Correo</label><input type="text" id="loginEmail" autocomplete="username">
-        <label for="loginPass">Contraseña</label><input type="password" id="loginPass" autocomplete="current-password">
+        <h2>Acceso del comité</h2>
+        <div id="emailBox"><label for="loginEmail">Correo</label><input type="text" id="loginEmail" autocomplete="username"></div>
+        <label for="loginPass">Clave de acceso</label><input type="password" id="loginPass" autocomplete="current-password">
         <button class="btn" id="btnLogin">Ingresar</button>
         <div id="loginMsg"></div>
       </div>
     </div>
-    <div class="footer-link no-print"><button class="btn link" id="adminLink">Acceso del comité electoral</button></div>
+    <div class="footer-link no-print"><button class="btn link" id="adminLink">Acceso del comité</button></div>
   </div>
 
-  <!-- VISTA ADMIN -->
   <div id="viewAdmin" class="hidden">
     <div class="tabs">
       <button data-tab="config" class="active">Configuración</button>
@@ -134,66 +144,70 @@ th{color:var(--soft);font-size:.72rem;text-transform:uppercase;letter-spacing:.0
     </div>
 
     <div id="tab-config">
-      <div id="lockNote" class="msg error hidden" style="margin:0 0 16px">La votación ya fue abierta: el padrón y los candidatos están bloqueados. Para modificarlos hay que reiniciar el proceso.</div>
+      <div id="liveNote" class="msg info hidden" style="margin:0 0 16px">La votación está en curso. Puedes corregir datos, padrón y candidatos: los cambios se aplican al instante. Un estudiante que ya votó no se puede quitar, y un candidato con votos no se puede eliminar.</div>
       <div class="card">
-        <h2>Datos generales</h2>
-        <label for="instInput">Institución educativa</label>
+        <h2>Datos del colegio</h2>
+        <label for="instInput">Nombre de la institución educativa</label>
         <input type="text" id="instInput" placeholder="Ej. I.E. N° 0148">
+        <label>Insignia del colegio</label>
+        <div class="upl"><div class="logo big" id="instPrev">ME</div><input type="file" id="instFile" accept="image/*"><button class="btn secondary small" id="btnInstClear">Quitar</button></div>
         <button class="btn" id="btnSaveInst">Guardar</button>
       </div>
       <div class="card">
-        <h2>Padrón de estudiantes hábiles</h2>
-        <label>Opción 1 — Cargar plantilla Excel (.xlsx / .csv)</label>
-        <div class="row"><input type="file" id="studentsFile" accept=".xlsx,.xls,.csv"><button class="btn secondary" id="btnTemplate" style="flex:0 0 auto">Descargar plantilla</button></div>
-        <p class="small-note">Dos columnas: A = DNI, CE o código (hasta 15 caracteres) y B = Apellidos y nombres; la fila de títulos se omite sola. Los números de 7 dígitos se completan con ceros a la izquierda hasta 8. Si hay CE con ceros iniciales, formatea esa columna como Texto en Excel.</p>
-        <label for="studentsBulk">Opción 2 — En bloque (una línea por estudiante: DNI, Nombre)</label>
+        <h2>Padrón de estudiantes</h2>
+        <label>Cargar plantilla Excel (.xlsx o .csv)</label>
+        <div class="row"><input type="file" id="studentsFile" accept=".xlsx,.xls,.csv"><button class="btn secondary" id="btnTemplate" style="flex:0 0 auto;margin:0">Descargar plantilla</button></div>
+        <p class="small-note">Dos columnas: DNI o CE, y APELLIDOS Y NOMBRES. Los DNI de 7 dígitos se completan con ceros a la izquierda.</p>
+        <label for="studentsBulk">O pega una línea por estudiante (DNI o CE, Nombre)</label>
         <textarea id="studentsBulk" placeholder="71234567, Juan Pérez&#10;70123456, María Gómez"></textarea>
         <button class="btn" id="btnAddStudents">Agregar al padrón</button>
-        <table id="studentsTable"><thead><tr><th>DNI</th><th>Nombre</th><th></th></tr></thead><tbody></tbody></table>
+        <label for="stuSearch">Buscar en el padrón</label><input type="text" id="stuSearch" placeholder="DNI o nombre">
+        <table id="studentsTable"><thead><tr><th>DNI o CE</th><th>Nombre</th><th></th></tr></thead><tbody></tbody></table>
         <p class="small-note" id="studentsCount"></p>
       </div>
       <div class="card">
-        <h2>Candidatos</h2>
+        <h2 id="candTitle">Listas y candidatos</h2>
         <div class="row">
-          <div><label for="candNum">Número / lista</label><input type="text" id="candNum" placeholder="Lista 1"></div>
-          <div><label for="candName">Nombre del candidato</label><input type="text" id="candName" placeholder="Nombre completo"></div>
+          <div><label for="candNum">Número o nombre de lista</label><input type="text" id="candNum" placeholder="Lista 1"></div>
+          <div><label for="candName">Candidato(a)</label><input type="text" id="candName" placeholder="Nombre completo"></div>
         </div>
-        <button class="btn" id="btnAddCand">Agregar candidato</button>
-        <table id="candTable"><thead><tr><th>Lista</th><th>Nombre</th><th></th></tr></thead><tbody></tbody></table>
+        <label>Logo de la lista</label>
+        <div class="upl"><div class="logo big" id="candPrev">Logo</div><input type="file" id="candFile" accept="image/*"><button class="btn secondary small" id="btnCandClear">Quitar</button></div>
+        <div class="row" style="gap:8px"><button class="btn" id="btnAddCand" style="flex:0 0 auto">Agregar lista</button><button class="btn secondary hidden" id="btnCancelCand" style="flex:0 0 auto">Cancelar edición</button></div>
+        <table id="candTable"><thead><tr><th></th><th>Lista</th><th>Candidato(a)</th><th></th></tr></thead><tbody></tbody></table>
       </div>
     </div>
 
     <div id="tab-control" class="hidden">
       <div class="card">
         <h2>Estado de la votación</h2>
-        <p>Estado actual: <span class="tag" id="ctlTag">SIN CONFIGURAR</span></p>
+        <p>Estado actual: <span class="tag" id="ctlTag">Sin configurar</span></p>
         <p class="small-note" id="ctlInfo"></p>
-        <div class="row"><button class="btn accent" id="btnOpen">Abrir votación</button><button class="btn secondary" id="btnClose">Cerrar votación</button></div>
-        <hr style="border:none;border-top:1px solid var(--line);margin:20px 0">
-        <button class="btn secondary" id="btnReset" style="color:var(--accent);border-color:var(--accent)">Reiniciar proceso (borra todo)</button>
+        <div class="row"><button class="btn accent" id="btnOpen">Abrir votación</button><button class="btn secondary" id="btnClose">Cerrar votación</button><button class="btn secondary" id="btnReopen">Reabrir votación</button></div>
+        <hr style="border:none;border-top:1px solid var(--line);margin:22px 0 4px">
+        <button class="btn secondary" id="btnReset" style="color:var(--red);border-color:var(--red)">Reiniciar proceso (borra todo)</button>
       </div>
     </div>
 
     <div id="tab-resultados" class="hidden">
-      <div class="card"><h2>Resultados en vivo</h2><p class="small-note" id="resSummary"></p><div id="resBars"></div></div>
+      <div class="card"><h2>Resultados en vivo</h2><div class="stats" id="stats"></div><button class="btn accent" id="btnClose2" style="margin:0 0 14px">Cerrar votación y ver acta de resultados</button><div id="integrity"></div><div id="resBars"></div></div>
     </div>
 
     <div id="tab-actas" class="hidden">
       <div class="card no-print"><h2>Actas</h2>
-        <div class="row"><button class="btn secondary" id="btnBorrador">Ver acta de borrador</button><button class="btn secondary" id="btnEscrutinio">Ver acta de escrutinio</button></div>
+        <div class="row"><button class="btn secondary" id="btnBorrador">Ver acta de apertura</button><button class="btn secondary" id="btnEscrutinio">Ver acta de escrutinio</button></div>
       </div>
       <div id="actaBox"></div>
-      <div class="row no-print hidden" id="printRow"><button class="btn" id="btnPrint">Imprimir / Guardar PDF</button></div>
+      <div class="row no-print hidden" id="printRow"><button class="btn" id="btnPrint">Imprimir o guardar PDF</button></div>
     </div>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getFirestore, doc, collection, getDoc, getDocs, setDoc, deleteDoc, onSnapshot, runTransaction, writeBatch } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, doc, collection, getDoc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot, runTransaction, writeBatch } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
-// ==== PEGA AQUÍ TUS CREDENCIALES (Firebase > Configuración del proyecto > Tus apps) ====
 const firebaseConfig = {
   apiKey: "AIzaSyCGHi-Po1G48Xy6loqFBD3G0iw4BHmSfqc",
   authDomain: "votaciones-4ea2e.firebaseapp.com",
@@ -202,26 +216,41 @@ const firebaseConfig = {
   messagingSenderId: "61824071159",
   appId: "1:61824071159:web:e792baaa1a0fe2aa67eaf2"
 };
-// Varios procesos o colegios en un mismo proyecto: abre la página con ?e=nombre (ej. ?e=ie0148-2026)
+// Si escribes tu correo aquí, el panel pedirá solo la clave. Si lo dejas vacío, pedirá correo y clave.
+const ADMIN_EMAIL = '';
 const EID = (new URLSearchParams(location.search).get('e') || 'principal').replace(/[^a-zA-Z0-9_-]/g, '');
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fecha = t => new Date(t).toLocaleString('es-PE');
 function fatal(t){ $('fatal').textContent = t; $('fatal').classList.remove('hidden'); }
-if (firebaseConfig.apiKey === 'TU_API_KEY') { fatal('Falta configurar Firebase: reemplaza firebaseConfig en el código con las credenciales de tu proyecto.'); throw new Error('Falta firebaseConfig'); }
 
 const app = initializeApp(firebaseConfig), db = getFirestore(app), auth = getAuth(app);
 const cfgRef = doc(db, 'elecciones', EID);
 const padCol = collection(db, 'elecciones', EID, 'padron');
 const urnaCol = collection(db, 'elecciones', EID, 'urna');
-const DEFAULT_CFG = { institucion:'', status:'setup', candidates:[], openedAt:null, closedAt:null };
+const DEFAULT_CFG = { institucion:'', insignia:'', status:'setup', candidates:[], openedAt:null, closedAt:null };
 let config = { ...DEFAULT_CFG }, padron = [], urna = [];
 let isAdmin = false, adminView = false, unsubAdmin = [], cfgStarted = false;
 let sel = null, curDni = null, curName = '', ballotKey = '';
+let newInsignia = null, newLogo = '', editId = null;   // null = sin cambios en insignia
 const errH = e => { console.error(e); alert('Error: ' + (e.code || e.message)); };
-const STATUS = { setup:['SIN CONFIGURAR','setup'], open:['VOTACIÓN ABIERTA','open'], closed:['VOTACIÓN CERRADA','closed'] };
+const STATUS = { setup:['Sin configurar','setup'], open:['Votación abierta','open'], closed:['Votación cerrada','closed'] };
+if (ADMIN_EMAIL) $('emailBox').classList.add('hidden');
 
-// ---- Sesión: votantes = anónimos; comité = correo y contraseña ----
+// ---- Imágenes: se reducen en el navegador y se guardan dentro de la configuración ----
+const img2url = (file, max) => new Promise((ok, no) => {
+  const r = new FileReader();
+  r.onload = () => { const i = new Image(); i.onload = () => {
+    const k = Math.min(1, max / Math.max(i.width, i.height)), c = document.createElement('canvas');
+    c.width = Math.round(i.width * k); c.height = Math.round(i.height * k);
+    c.getContext('2d').drawImage(i, 0, 0, c.width, c.height); ok(c.toDataURL('image/webp', .85));
+  }; i.onerror = no; i.src = r.result; };
+  r.onerror = no; r.readAsDataURL(file);
+});
+const imgTag = (src, alt) => src ? `<img src="${esc(src)}" alt="${esc(alt || '')}">` : '';
+const sealHtml = () => config.insignia ? imgTag(config.insignia, 'Insignia') : 'ME';
+
 onAuthStateChanged(auth, u => {
   if (!u) { signInAnonymously(auth).catch(e => fatal('No se pudo conectar: ' + (e.code || e.message))); return; }
   isAdmin = !u.isAnonymous;
@@ -234,15 +263,15 @@ onAuthStateChanged(auth, u => {
   } else { padron = []; urna = []; }
   if (!cfgStarted) {
     cfgStarted = true;
-    onSnapshot(cfgRef, s => { config = { ...DEFAULT_CFG, ...(s.exists() ? s.data() : {}) }; renderAll(); }, e => fatal('No se pudo leer la elección (revisa reglas de Firestore): ' + (e.code || e.message)));
+    onSnapshot(cfgRef, s => { config = { ...DEFAULT_CFG, ...(s.exists() ? s.data() : {}) }; renderAll(); }, e => fatal('No se pudo leer la elección (revisa las reglas de Firestore): ' + (e.code || e.message)));
   }
   renderRole();
 });
 
-// ---- Render ----
 function renderAll(){
   $('instName').textContent = config.institucion || 'Institución educativa no configurada';
   $('dniInst').textContent = config.institucion || 'Institución educativa';
+  ['seal','dniSeal','ballotSeal'].forEach(i => $(i).innerHTML = sealHtml());
   const [lbl, cls] = STATUS[config.status] || STATUS.setup;
   $('statusTag').textContent = lbl; $('statusTag').className = 'tag ' + cls;
   renderBallot(); renderAdmin();
@@ -257,19 +286,19 @@ function renderRole(){
   renderAdmin();
 }
 function markSel(){
-  document.querySelectorAll('#candidateList .candidate-opt, #blankOption').forEach(o => o.classList.toggle('selected', o.dataset.id === sel));
+  document.querySelectorAll('#candidateList .cand, #blankOption').forEach(o => o.classList.toggle('selected', o.dataset.id === sel));
   $('btnConfirmVote').disabled = !sel;
 }
+const logoBox = (c, big) => `<div class="logo ${big ? 'big' : ''}">${c.logo ? imgTag(c.logo, 'Logo ' + c.lista) : esc((c.lista || '').slice(0, 3))}</div>`;
 function renderBallot(){
-  $('ballotInst').textContent = config.institucion || 'Municipio Escolar';
   const key = JSON.stringify(config.candidates);
-  if (key === ballotKey) return;          // no reconstruir la cédula si no cambiaron los candidatos
+  if (key === ballotKey) return;
   ballotKey = key;
-  $('candidateList').innerHTML = config.candidates.map(c => `<button type="button" class="candidate-opt" data-id="${esc(c.id)}"><div class="num">${esc(c.lista)}</div><div><strong>${esc(c.name)}</strong></div></button>`).join('');
+  $('candidateList').innerHTML = config.candidates.map(c => `<button type="button" class="cand" data-id="${esc(c.id)}">${logoBox(c, true)}<div><div class="lista">${esc(c.lista)}</div><strong>${esc(c.name)}</strong></div></button>`).join('');
   if (sel && sel !== 'BLANK' && !config.candidates.some(c => c.id === sel)) sel = null;
   markSel();
 }
-$('candidateList').onclick = e => { const b = e.target.closest('.candidate-opt'); if (b) { sel = b.dataset.id; markSel(); } };
+$('candidateList').onclick = e => { const b = e.target.closest('.cand'); if (b) { sel = b.dataset.id; markSel(); } };
 $('blankOption').dataset.id = 'BLANK';
 $('blankOption').onclick = () => { sel = 'BLANK'; markSel(); };
 
@@ -282,30 +311,38 @@ const pct = (n, t) => t ? Math.round(n / t * 100) : 0;
 
 function renderAdmin(){
   if (!isAdmin) return;
-  const setup = config.status === 'setup';
+  const st = config.status;
+  $('liveNote').classList.toggle('hidden', st !== 'open');
   if (document.activeElement !== $('instInput')) $('instInput').value = config.institucion || '';
-  $('lockNote').classList.toggle('hidden', setup);
-  ['studentsFile','studentsBulk','btnAddStudents','candNum','candName','btnAddCand'].forEach(id => $(id).disabled = !setup);
+  const ins = newInsignia === null ? config.insignia : newInsignia;
+  $('instPrev').innerHTML = ins ? imgTag(ins) : 'ME';
+  $('candPrev').innerHTML = newLogo ? imgTag(newLogo) : 'Logo';
 
-  const rows = [...padron].sort((a, b) => String(a.name).localeCompare(String(b.name)));
+  const q = $('stuSearch').value.trim().toLowerCase();
+  const rows = padron.filter(p => !q || p.dni.toLowerCase().includes(q) || String(p.name).toLowerCase().includes(q))
+    .sort((a, b) => String(a.name).localeCompare(String(b.name)));
   $('studentsTable').querySelector('tbody').innerHTML = rows.slice(0, 200).map(p =>
-    `<tr><td>${esc(p.dni)}</td><td>${esc(p.name)}</td><td>${setup ? `<button class="btn small secondary" data-del="${esc(p.dni)}">Quitar</button>` : (p.voted ? '✔ votó' : '')}</td></tr>`).join('');
-  $('studentsCount').textContent = padron.length + ' estudiante(s) en el padrón' + (rows.length > 200 ? ' (se muestran los primeros 200)' : '');
+    `<tr><td>${esc(p.dni)}</td><td>${esc(p.name)}${p.voted ? ' <span class="tag open">votó</span>' : ''}</td><td class="act"><button class="btn small secondary" data-edit="${esc(p.dni)}">Editar</button><button class="btn small secondary" data-del="${esc(p.dni)}" ${p.voted ? 'disabled title="Ya votó"' : ''}>Quitar</button></td></tr>`).join('');
+  $('studentsCount').textContent = padron.length + ' estudiante(s) en el padrón' + (rows.length > 200 ? ' (se muestran 200; usa el buscador)' : '');
+
+  const t = tally();
   $('candTable').querySelector('tbody').innerHTML = config.candidates.map(c =>
-    `<tr><td>${esc(c.lista)}</td><td>${esc(c.name)}</td><td>${setup ? `<button class="btn small secondary" data-delc="${esc(c.id)}">Quitar</button>` : ''}</td></tr>`).join('');
+    `<tr><td>${logoBox(c)}</td><td>${esc(c.lista)}</td><td>${esc(c.name)}</td><td class="act"><button class="btn small secondary" data-editc="${esc(c.id)}">Editar</button><button class="btn small secondary" data-delc="${esc(c.id)}">Quitar</button></td></tr>`).join('') || '<tr><td colspan="4" class="small-note">Aún no hay listas registradas.</td></tr>';
 
-  const [lbl, cls] = STATUS[config.status] || STATUS.setup;
+  const [lbl, cls] = STATUS[st] || STATUS.setup;
   $('ctlTag').textContent = lbl; $('ctlTag').className = 'tag ' + cls;
-  $('ctlInfo').textContent = setup ? (urna.length ? 'Hay votos de un proceso anterior: reinicia el proceso antes de abrir.' : 'Agrega candidatos y estudiantes antes de abrir la votación.')
-    : config.status === 'open' ? 'Abierta desde: ' + new Date(config.openedAt).toLocaleString() : 'Cerrada: ' + new Date(config.closedAt).toLocaleString();
-  $('btnOpen').disabled = !(setup && config.candidates.length && padron.length && !urna.length);
-  $('btnClose').disabled = config.status !== 'open';
+  $('ctlInfo').textContent = st === 'setup' ? (urna.length ? 'Hay votos de un proceso anterior: reinicia el proceso antes de abrir.' : 'Registra las listas y el padrón antes de abrir la votación.')
+    : st === 'open' ? 'Abierta desde: ' + fecha(config.openedAt) : 'Cerrada: ' + fecha(config.closedAt) + '. Puedes reabrirla si fue un error.';
+  $('btnOpen').disabled = !(st === 'setup' && config.candidates.length && padron.length && !urna.length);
+  $('btnClose').disabled = st !== 'open'; $('btnClose2').disabled = st !== 'open';
+  $('btnReopen').disabled = st !== 'closed';
 
-  const t = tally(), tot = t.total;
-  $('resSummary').textContent = `${tot} de ${padron.length} estudiante(s) hábiles ya votaron.`;
+  const voted = padron.filter(p => p.voted).length;
+  $('stats').innerHTML = [[padron.length, 'Estudiantes hábiles'], [voted, 'Ya votaron'], [Math.max(0, padron.length - voted), 'Faltan votar'], [pct(voted, padron.length) + '%', 'Participación']].map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
+  $('integrity').innerHTML = voted === urna.length ? '' : `<div class="msg error">Atención: hay ${voted} estudiante(s) marcados como votantes pero ${urna.length} papeleta(s) en la urna. Revisa antes de firmar el acta.</div>`;
   $('resBars').innerHTML = config.candidates.concat([{ id:'_b', lista:'', name:'Voto en blanco' }]).map(c => {
-    const n = c.id === '_b' ? t.blank : (t.c[c.id] || 0), p = pct(n, tot);
-    return `<div class="bar-row"><div class="bar-label"><span>${esc(c.lista)}${c.lista ? ' — ' : ''}${esc(c.name)}</span><span>${n} voto(s) · ${p}%</span></div><div class="bar-track"><div class="bar-fill ${c.id === '_b' ? 'blank' : ''}" style="width:${p}%"></div></div></div>`;
+    const n = c.id === '_b' ? t.blank : (t.c[c.id] || 0), p = pct(n, t.total);
+    return `<div class="bar-row">${c.id === '_b' ? '' : logoBox(c)}<div><div class="bar-label"><span>${esc(c.lista)}${c.lista ? ': ' : ''}${esc(c.name)}</span><span>${n} voto(s), ${p}%</span></div><div class="bar-track"><div class="bar-fill ${c.id === '_b' ? 'blank' : ''}" style="width:${p}%"></div></div></div></div>`;
   }).join('');
 }
 
@@ -324,10 +361,10 @@ $('btnCheckDni').onclick = async () => {
   msg.innerHTML = '';
   const dni = normDni($('dniInput').value);
   if (config.status !== 'open') return err('La votación no está abierta en este momento.');
-  if (!dni) return err('Ingresa tu DNI.');
+  if (!dni) return err('Ingresa tu DNI o CE.');
   try {
     const s = await getDoc(doc(padCol, dni));
-    if (!s.exists()) return err('Tu DNI no figura en el padrón habilitado.');
+    if (!s.exists()) return err('Tu documento no figura en el padrón. Consulta con el comité electoral.');
     if (s.data().voted) return err('Este DNI ya registró su voto.');
     curDni = dni; curName = s.data().name; sel = null; markSel();
     $('voterName').textContent = 'Votante: ' + curName;
@@ -339,7 +376,6 @@ $('btnConfirmVote').onclick = async () => {
   if (!sel || !curDni) return;
   btn.disabled = true;
   try {
-    // Transacción: valida estado, padrón y "no ha votado", marca el voto y registra la papeleta anónima, todo junto.
     await runTransaction(db, async tx => {
       const c = await tx.get(cfgRef);
       if (!c.exists() || c.data().status !== 'open') throw new Error('CERRADA');
@@ -353,21 +389,21 @@ $('btnConfirmVote').onclick = async () => {
     $('stepVote').classList.add('hidden'); $('stepDone').classList.remove('hidden');
     setTimeout(() => { if (!$('stepDone').classList.contains('hidden')) resetFlow(); }, 6000);
   } catch (e) {
-    const m = { CERRADA:'La votación ya fue cerrada.', YAVOTO:'Este DNI ya registró su voto.', NOPADRON:'Tu DNI ya no figura en el padrón.', CAND:'La cédula cambió; vuelve a elegir.' }[e.message];
+    const m = { CERRADA:'La votación ya fue cerrada.', YAVOTO:'Este DNI ya registró su voto.', NOPADRON:'Tu DNI ya no figura en el padrón.', CAND:'La cédula cambió. Vuelve a elegir.' }[e.message];
     console.error(e);
     msg.innerHTML = `<div class="msg error">${m || 'No se pudo registrar el voto. Verifica la conexión e inténtalo otra vez.'}</div>`;
     if (m && e.message !== 'CAND') setTimeout(resetFlow, 3500); else btn.disabled = !sel;
   }
 };
 
-// ---- Acceso comité ----
+// ---- Acceso del comité ----
 $('adminLink').onclick = () => $('loginCard').classList.toggle('hidden');
 $('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') $('btnLogin').click(); });
 $('btnLogin').onclick = async () => {
   try {
-    await signInWithEmailAndPassword(auth, $('loginEmail').value.trim(), $('loginPass').value);
+    await signInWithEmailAndPassword(auth, ADMIN_EMAIL || $('loginEmail').value.trim(), $('loginPass').value);
     adminView = true; $('loginPass').value = ''; $('loginMsg').innerHTML = ''; $('loginCard').classList.add('hidden'); renderRole();
-  } catch (e) { $('loginMsg').innerHTML = '<div class="msg error">Correo o contraseña incorrectos.</div>'; }
+  } catch (e) { $('loginMsg').innerHTML = `<div class="msg error">${ADMIN_EMAIL ? 'Clave incorrecta.' : 'Correo o clave incorrectos.'}</div>`; }
 };
 $('btnLock').onclick = async () => { adminView = false; resetFlow(); await signOut(auth); };
 $('btnRoleVote').onclick = () => { adminView = false; renderRole(); };
@@ -377,12 +413,17 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
   ['config','control','resultados','actas'].forEach(t => $('tab-' + t).classList.toggle('hidden', t !== b.dataset.tab));
 });
 
-// ---- Admin: configuración ----
+// ---- Configuración (editable en cualquier momento) ----
 const saveCfg = patch => setDoc(cfgRef, patch, { merge: true }).catch(errH);
-$('btnSaveInst').onclick = () => saveCfg({ institucion: $('instInput').value.trim() });
+$('instFile').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { newInsignia = await img2url(f, 240); renderAdmin(); } catch { alert('No se pudo leer la imagen.'); } };
+$('btnInstClear').onclick = () => { newInsignia = ''; $('instFile').value = ''; renderAdmin(); };
+$('btnSaveInst').onclick = async () => {
+  const p = { institucion: $('instInput').value.trim() };
+  if (newInsignia !== null) p.insignia = newInsignia;
+  await saveCfg(p); newInsignia = null; $('instFile').value = '';
+};
 
 async function addStudents(pairs){
-  if (config.status !== 'setup') return 0;
   const have = new Set(padron.map(p => p.dni)), seen = new Set(), todo = [];
   for (const [d, n] of pairs) {
     const dni = normDni(d), name = String(n ?? '').trim();
@@ -393,16 +434,17 @@ async function addStudents(pairs){
     todo.slice(i, i + 400).forEach(([dni, name]) => b.set(doc(padCol, dni), { name, voted: false }));
     await b.commit();
   }
-  return todo.length;
+  return [todo.length, pairs.length - todo.length];
 }
+const reportAdd = ([n, skip]) => alert(n + ' estudiante(s) agregado(s).' + (skip ? '\n' + skip + ' omitido(s) por estar repetidos o tener datos incompletos.' : ''));
 $('btnAddStudents').onclick = async () => {
   const raw = $('studentsBulk').value.trim(); if (!raw) return;
-  const pairs = raw.split('\n').map(l => { const i = l.indexOf(','); return i < 0 ? [] : [l.slice(0, i), l.slice(i + 1)]; });
-  try { const n = await addStudents(pairs); $('studentsBulk').value = ''; alert(n + ' estudiante(s) agregado(s).'); } catch (e) { errH(e); }
+  const pairs = raw.split('\n').filter(l => l.trim()).map(l => { const i = l.search(/[,\t;]/); return i < 0 ? [] : [l.slice(0, i), l.slice(i + 1)]; });
+  try { reportAdd(await addStudents(pairs)); $('studentsBulk').value = ''; } catch (e) { errH(e); }
 };
 $('btnTemplate').onclick = () => {
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['DNI','APELLIDOS Y NOMBRES'],['71234567','PÉREZ LÓPEZ JUAN CARLOS'],['23146638200080','GÓMEZ RUIZ MARÍA (código sin DNI)']]), 'Padrón');
+  XLSX.utils.book_append_sheet(wb, (() => { const w = XLSX.utils.aoa_to_sheet([['DNI','APELLIDOS Y NOMBRES'],['71234567','QUISPE MAMANI JUAN CARLOS'],['70123456','GOMEZ RUIZ MARIA FERNANDA']]); w['!cols'] = [{ wch: 24 }, { wch: 55 }]; return w; })(), 'Padrón');
   XLSX.writeFile(wb, 'plantilla_padron_estudiantes.xlsx');
 };
 $('studentsFile').onchange = e => {
@@ -413,64 +455,107 @@ $('studentsFile').onchange = e => {
       const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
       const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false });
       const body = rows.length && /dni/i.test(String(rows[0][0] ?? '')) ? rows.slice(1) : rows;
-      const n = await addStudents(body.map(x => [x[0], x[1]]));
-      alert(n + ' estudiante(s) agregado(s) desde el archivo.');
+      reportAdd(await addStudents(body.map(x => [x[0], x[1]])));
     } catch (err) { errH(err); }
     e.target.value = '';
   };
   r.readAsArrayBuffer(file);
 };
-$('studentsTable').onclick = e => { const d = e.target.dataset.del; if (d && config.status === 'setup') deleteDoc(doc(padCol, d)).catch(errH); };
-$('btnAddCand').onclick = () => {
-  const lista = $('candNum').value.trim(), name = $('candName').value.trim();
-  if (!lista || !name || config.status !== 'setup') return;
-  saveCfg({ candidates: [...config.candidates, { id: 'c_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), lista, name }] });
-  $('candNum').value = ''; $('candName').value = '';
+$('stuSearch').oninput = renderAdmin;
+$('studentsTable').onclick = async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const p = padron.find(x => x.dni === (b.dataset.edit || b.dataset.del)); if (!p) return;
+  try {
+    if (b.dataset.edit) { const n = prompt('Nombre del estudiante (DNI ' + p.dni + '):', p.name); if (n && n.trim()) await updateDoc(doc(padCol, p.dni), { name: n.trim() }); }
+    else if (!p.voted && confirm('¿Quitar a ' + p.name + ' del padrón?')) await deleteDoc(doc(padCol, p.dni));
+  } catch (err) { errH(err); }
 };
-$('candTable').onclick = e => { const id = e.target.dataset.delc; if (id && config.status === 'setup') saveCfg({ candidates: config.candidates.filter(c => c.id !== id) }); };
 
-// ---- Admin: control ----
-$('btnOpen').onclick = () => { if (confirm('¿Abrir la votación? Luego no se podrá editar el padrón ni los candidatos.')) saveCfg({ status: 'open', openedAt: Date.now(), closedAt: null }); };
-$('btnClose').onclick = () => { if (confirm('¿Cerrar la votación? No se podrá reabrir.')) saveCfg({ status: 'closed', closedAt: Date.now() }); };
+$('candFile').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { newLogo = await img2url(f, 160); renderAdmin(); } catch { alert('No se pudo leer la imagen.'); } };
+$('btnCandClear').onclick = () => { newLogo = ''; $('candFile').value = ''; renderAdmin(); };
+function endEdit(){
+  editId = null; newLogo = ''; ['candNum','candName','candFile'].forEach(i => $(i).value = '');
+  $('btnAddCand').textContent = 'Agregar lista'; $('btnCancelCand').classList.add('hidden'); $('candTitle').textContent = 'Listas y candidatos'; renderAdmin();
+}
+$('btnCancelCand').onclick = endEdit;
+$('btnAddCand').onclick = async () => {
+  const lista = $('candNum').value.trim(), name = $('candName').value.trim();
+  if (!lista || !name) return alert('Escribe el nombre de la lista y del candidato.');
+  if (editId) await saveCfg({ candidates: config.candidates.map(c => c.id === editId ? { ...c, lista, name, logo: newLogo } : c) });
+  else {
+    if (config.status === 'open' && !confirm('La votación está abierta. ¿Agregar esta lista ahora?')) return;
+    await saveCfg({ candidates: [...config.candidates, { id: 'c_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), lista, name, logo: newLogo }] });
+  }
+  endEdit();
+};
+$('candTable').onclick = async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.editc) {
+    const c = config.candidates.find(x => x.id === b.dataset.editc); if (!c) return;
+    editId = c.id; newLogo = c.logo || ''; $('candNum').value = c.lista; $('candName').value = c.name;
+    $('btnAddCand').textContent = 'Guardar cambios'; $('btnCancelCand').classList.remove('hidden'); $('candTitle').textContent = 'Editando: ' + c.lista;
+    renderAdmin(); $('candNum').focus();
+  } else if (b.dataset.delc) {
+    const id = b.dataset.delc;
+    if (tally().c[id]) return alert('Esta lista ya tiene votos y no se puede eliminar. Puedes editar sus datos.');
+    if (confirm('¿Quitar esta lista?')) { await saveCfg({ candidates: config.candidates.filter(c => c.id !== id) }); if (editId === id) endEdit(); }
+  }
+};
+
+// ---- Control ----
+$('btnOpen').onclick = () => { if (confirm('¿Abrir la votación? Podrás seguir corrigiendo datos mientras esté abierta.')) saveCfg({ status: 'open', openedAt: Date.now(), closedAt: null }); };
+$('btnClose').onclick = $('btnClose2').onclick = async () => {
+  if (!confirm('¿Cerrar la votación? Los estudiantes ya no podrán votar.')) return;
+  await saveCfg({ status: 'closed', closedAt: Date.now() });
+  document.querySelector('[data-tab="actas"]').click(); showActa(buildEscrutinio());
+};
+$('btnReopen').onclick = () => { if (confirm('¿Reabrir la votación? Los votos ya emitidos se conservan.')) saveCfg({ status: 'open', closedAt: null }); };
 $('btnReset').onclick = async () => {
-  if (prompt('Esto borra padrón, candidatos y votos. Escribe REINICIAR para confirmar:') !== 'REINICIAR') return;
+  if (prompt('Esto borra padrón, listas y votos. Imprime antes el acta de escrutinio. Escribe REINICIAR para confirmar:') !== 'REINICIAR') return;
   try {
     for (const col of [padCol, urnaCol]) {
       const docs = (await getDocs(col)).docs;
       for (let i = 0; i < docs.length; i += 400) { const b = writeBatch(db); docs.slice(i, i + 400).forEach(d => b.delete(d.ref)); await b.commit(); }
     }
-    await setDoc(cfgRef, { institucion: config.institucion || '', status: 'setup', candidates: [], openedAt: null, closedAt: null });
+    await setDoc(cfgRef, { institucion: config.institucion || '', insignia: config.insignia || '', status: 'setup', candidates: [], openedAt: null, closedAt: null });
   } catch (e) { errH(e); }
 };
 
 // ---- Actas ----
 const actaRef = () => 'ACTA ' + EID.toUpperCase() + '-' + new Date().getFullYear() + '-ME';
-const firmas = '<div class="firmas"><div>Presidente(a) del Comité Electoral</div><div>Asesor(a) / Docente responsable</div></div>';
+const firmas = '<div class="firmas"><div>Presidente(a) del Comité Electoral</div><div>Asesor(a) o docente responsable</div></div>';
+const actaHead = t => `<div class="ref">${esc(actaRef())}</div><div class="head"><div class="seal">${sealHtml()}</div><h2>${t}</h2><div class="sub">${esc(config.institucion || 'Institución educativa')}</div></div>`;
 function buildBorrador(){
-  return `<div class="acta"><div class="ref">${esc(actaRef())}</div><h2>ACTA DE BORRADOR — MUNICIPIO ESCOLAR</h2><div class="sub">${esc(config.institucion || 'Institución educativa')}</div>
-  <p>Siendo las <strong>${config.openedAt ? new Date(config.openedAt).toLocaleString() : '[pendiente de apertura]'}</strong>, se deja constancia del inicio del proceso de votación del Municipio Escolar, con la siguiente información registrada:</p><hr>
-  <p><strong>Total de estudiantes hábiles para votar:</strong> ${padron.length}</p><p><strong>Candidatos inscritos:</strong></p>
-  <table><thead><tr><th>Lista</th><th>Candidato</th></tr></thead><tbody>${config.candidates.map(x => `<tr><td>${esc(x.lista)}</td><td>${esc(x.name)}</td></tr>`).join('') || '<tr><td colspan="2">Sin candidatos registrados</td></tr>'}</tbody></table>
-  <p class="small-note">Se deja constancia de que el proceso se realiza de forma virtual, con un voto único por estudiante.</p>${firmas}</div>`;
+  return `<div class="acta">${actaHead('Acta de apertura de la votación')}
+  <p>Siendo las <strong>${config.openedAt ? fecha(config.openedAt) : '[pendiente de apertura]'}</strong>, se deja constancia del inicio de la votación del Municipio Escolar, con la siguiente información:</p><hr>
+  <p><strong>Estudiantes hábiles para votar:</strong> ${padron.length}</p><p><strong>Listas inscritas:</strong></p>
+  <table><thead><tr><th>Lista</th><th>Candidato(a)</th></tr></thead><tbody>${config.candidates.map(x => `<tr><td>${esc(x.lista)}</td><td>${esc(x.name)}</td></tr>`).join('') || '<tr><td colspan="2">Sin listas registradas</td></tr>'}</tbody></table>
+  <p class="small-note">El proceso se realiza de forma virtual, con un voto único por estudiante.</p>${firmas}</div>`;
 }
 function resultText(t){
   if (!t.total) return 'No se emitieron votos.';
   const max = Math.max(0, ...config.candidates.map(x => t.c[x.id] || 0));
   if (!max) return 'Todos los votos emitidos fueron en blanco; no hay lista ganadora.';
   const top = config.candidates.filter(x => (t.c[x.id] || 0) === max);
-  let s = top.length > 1 ? 'Hay <strong>empate</strong> entre: ' + top.map(x => esc(x.lista + ' — ' + x.name)).join('; ') + '. Corresponde definir desempate según el reglamento.'
-                         : `Resulta ganadora la lista <strong>${esc(top[0].lista)} — ${esc(top[0].name)}</strong>.`;
+  let s = top.length > 1 ? 'Hay <strong>empate</strong> entre: ' + top.map(x => esc(x.lista + ': ' + x.name)).join('; ') + '. Corresponde definir el desempate según el reglamento.'
+                         : `Resulta ganadora la lista <strong>${esc(top[0].lista)}</strong>, con ${esc(top[0].name)} como candidato(a).`;
   if (t.blank > max) s += ' Nota: el voto en blanco superó a la lista más votada.';
   return s;
 }
 function buildEscrutinio(){
   const t = tally(), hab = padron.length;
-  const rows = config.candidates.map(x => [x.lista + ' — ' + x.name, t.c[x.id] || 0]).concat([['Voto en blanco', t.blank]]);
-  return `<div class="acta"><div class="ref">${esc(actaRef())}</div><h2>ACTA DE ESCRUTINIO — MUNICIPIO ESCOLAR</h2><div class="sub">${esc(config.institucion || 'Institución educativa')}</div>
-  <p>Siendo las <strong>${config.closedAt ? new Date(config.closedAt).toLocaleString() : '[pendiente de cierre]'}</strong>, se procede al escrutinio de los votos emitidos en el proceso de elección del Municipio Escolar.</p><hr>
-  <p><strong>Estudiantes hábiles:</strong> ${hab} &nbsp;|&nbsp; <strong>Votos emitidos:</strong> ${t.total} &nbsp;|&nbsp; <strong>Participación:</strong> ${pct(t.total, hab)}%</p>
+  const rows = config.candidates.map(x => [x.lista + ': ' + x.name, t.c[x.id] || 0]).concat([['Voto en blanco', t.blank]]);
+  const closed = config.status === 'closed', mx = Math.max(0, ...config.candidates.map(x => t.c[x.id] || 0));
+  const chart = config.candidates.map(x => ({ ...x, n: t.c[x.id] || 0 })).concat([{ id:'_b', lista:'', name:'Voto en blanco', n:t.blank }]).map(c => {
+    const win = closed && mx && c.id !== '_b' && c.n === mx, p = pct(c.n, t.total);
+    return `<div class="bar-row ${win ? 'win' : ''}">${c.id === '_b' ? '<div class="logo big">—</div>' : logoBox(c, true)}<div><div class="bar-label"><span>${esc(c.lista)}${c.lista ? ': ' : ''}${esc(c.name)}${win ? ' ★ Ganadora' : ''}</span><span>${c.n} voto(s), ${p}%</span></div><div class="bar-track"><div class="bar-fill ${c.id === '_b' ? 'blank' : ''}" style="width:${p}%"></div></div></div></div>`;
+  }).join('');
+  return `<div class="acta">${actaHead(config.status === 'closed' ? 'Acta de escrutinio' : 'Acta de escrutinio (resultados parciales)')}
+  <p>Siendo las <strong>${config.closedAt ? fecha(config.closedAt) : '[pendiente de cierre]'}</strong>, se realiza el escrutinio de los votos emitidos en la elección del Municipio Escolar.</p><hr>
+  <div class="stats">${[[hab, 'Estudiantes hábiles'], [t.total, 'Votos emitidos'], [pct(t.total, hab) + '%', 'Participación']].map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('')}</div>
+  <div style="margin:18px 0 6px">${chart}</div>
   <table><thead><tr><th>Opción</th><th>Votos</th><th>%</th></tr></thead><tbody>${rows.map(([n, v]) => `<tr><td>${esc(n)}</td><td>${v}</td><td>${pct(v, t.total)}%</td></tr>`).join('')}</tbody></table><hr>
-  <p><strong>Resultado:</strong> ${config.status === 'closed' ? resultText(t) : 'La votación aún no ha sido cerrada oficialmente.'}</p>${firmas}</div>`;
+  <p><strong>Resultado:</strong> ${config.status === 'closed' ? resultText(t) : 'La votación sigue abierta: estas cifras son parciales y no son definitivas. Cierra la votación para generar el acta oficial.'}</p>${firmas}</div>`;
 }
 const showActa = html => { $('actaBox').innerHTML = html; $('printRow').classList.remove('hidden'); };
 $('btnBorrador').onclick = () => showActa(buildBorrador());
