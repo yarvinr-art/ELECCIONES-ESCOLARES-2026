@@ -72,7 +72,7 @@ th{color:var(--soft);font-size:.8rem;font-weight:600}td.act{text-align:right;whi
 .acta h2{font-size:1.2rem;margin-bottom:2px}.acta .sub{color:var(--soft);font-size:.88rem;margin-bottom:20px}
 .acta hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 .firmas{display:flex;justify-content:space-between;margin-top:60px}
-.firmas div{width:40%;border-top:1px solid var(--ink);text-align:center;padding-top:6px;font-size:.8rem;color:var(--soft)}
+.firmas div{width:30%;border-top:1px solid var(--ink);text-align:center;padding-top:6px;font-size:.8rem;color:var(--soft)}
 .small-note{font-size:.8rem;color:var(--soft);margin-top:6px}
 .footer-link{text-align:center;margin-top:30px}
 @media print{header.top,nav.roles,.tabs,.no-print,.footer-link{display:none!important}body{background:#fff}.app{padding:0;max-width:100%}.acta{border:none;padding:0}}
@@ -83,7 +83,7 @@ th{color:var(--soft);font-size:.8rem;font-weight:600}td.act{text-align:right;whi
   <header class="top">
     <div class="seal" id="seal">ME</div>
     <div class="titles"><h1>Elecciones del Municipio Escolar</h1><div class="inst" id="instName">Institución educativa no configurada</div></div>
-    <span class="tag setup" id="statusTag">Sin configurar</span>
+    <span class="tag setup" id="statusTag">En preparación</span>
   </header>
   <div id="fatal" class="msg error hidden"></div>
 
@@ -151,6 +151,12 @@ th{color:var(--soft);font-size:.8rem;font-weight:600}td.act{text-align:right;whi
         <input type="text" id="instInput" placeholder="Ej. I.E. N° 0148">
         <label>Insignia del colegio</label>
         <div class="upl"><div class="logo big" id="instPrev">ME</div><input type="file" id="instFile" accept="image/*"><button class="btn secondary small" id="btnInstClear">Quitar</button></div>
+        <label style="margin-top:20px;font-size:.95rem;color:var(--ink)">Comité electoral (aparece en las actas)</label>
+        <div class="row">
+          <div><label for="comPres">Presidente(a)</label><input type="text" id="comPres" placeholder="Nombre completo"></div>
+          <div><label for="comSec">Secretario(a)</label><input type="text" id="comSec" placeholder="Nombre completo"></div>
+          <div><label for="comVoc">Vocal</label><input type="text" id="comVoc" placeholder="Nombre completo"></div>
+        </div>
         <button class="btn" id="btnSaveInst">Guardar</button>
       </div>
       <div class="card">
@@ -181,7 +187,7 @@ th{color:var(--soft);font-size:.8rem;font-weight:600}td.act{text-align:right;whi
     <div id="tab-control" class="hidden">
       <div class="card">
         <h2>Estado de la votación</h2>
-        <p>Estado actual: <span class="tag" id="ctlTag">Sin configurar</span></p>
+        <p>Estado actual: <span class="tag" id="ctlTag">En preparación</span></p>
         <p class="small-note" id="ctlInfo"></p>
         <div class="row"><button class="btn accent" id="btnOpen">Abrir votación</button><button class="btn secondary" id="btnClose">Cerrar votación</button><button class="btn secondary" id="btnReopen">Reabrir votación</button></div>
         <hr style="border:none;border-top:1px solid var(--line);margin:22px 0 4px">
@@ -229,13 +235,13 @@ const app = initializeApp(firebaseConfig), db = getFirestore(app), auth = getAut
 const cfgRef = doc(db, 'elecciones', EID);
 const padCol = collection(db, 'elecciones', EID, 'padron');
 const urnaCol = collection(db, 'elecciones', EID, 'urna');
-const DEFAULT_CFG = { institucion:'', insignia:'', status:'setup', candidates:[], openedAt:null, closedAt:null };
+const DEFAULT_CFG = { institucion:'', insignia:'', comite:{}, status:'setup', candidates:[], openedAt:null, closedAt:null };
 let config = { ...DEFAULT_CFG }, padron = [], urna = [];
 let isAdmin = false, adminView = false, unsubAdmin = [], cfgStarted = false;
 let sel = null, curDni = null, curName = '', ballotKey = '';
 let newInsignia = null, newLogo = '', editId = null;   // null = sin cambios en insignia
 const errH = e => { console.error(e); alert('Error: ' + (e.code || e.message)); };
-const STATUS = { setup:['Sin configurar','setup'], open:['Votación abierta','open'], closed:['Votación cerrada','closed'] };
+const STATUS = { setup:['En preparación','setup'], open:['Votación abierta','open'], closed:['Votación cerrada','closed'] };
 if (ADMIN_EMAIL) $('emailBox').classList.add('hidden');
 
 // ---- Imágenes: se reducen en el navegador y se guardan dentro de la configuración ----
@@ -314,6 +320,8 @@ function renderAdmin(){
   const st = config.status;
   $('liveNote').classList.toggle('hidden', st !== 'open');
   if (document.activeElement !== $('instInput')) $('instInput').value = config.institucion || '';
+  const cm = config.comite || {};
+  [['comPres','presidente'],['comSec','secretario'],['comVoc','vocal']].forEach(([i, k]) => { if (document.activeElement !== $(i)) $(i).value = cm[k] || ''; });
   const ins = newInsignia === null ? config.insignia : newInsignia;
   $('instPrev').innerHTML = ins ? imgTag(ins) : 'ME';
   $('candPrev').innerHTML = newLogo ? imgTag(newLogo) : 'Logo';
@@ -331,7 +339,7 @@ function renderAdmin(){
 
   const [lbl, cls] = STATUS[st] || STATUS.setup;
   $('ctlTag').textContent = lbl; $('ctlTag').className = 'tag ' + cls;
-  $('ctlInfo').textContent = st === 'setup' ? (urna.length ? 'Hay votos de un proceso anterior: reinicia el proceso antes de abrir.' : 'Registra las listas y el padrón antes de abrir la votación.')
+  $('ctlInfo').textContent = st === 'setup' ? (urna.length ? 'Hay votos de un proceso anterior: reinicia el proceso antes de abrir.' : (!config.candidates.length ? 'Falta registrar al menos una lista.' : !padron.length ? 'Falta cargar el padrón de estudiantes.' : 'Todo listo. Pulsa "Abrir votación" para que los estudiantes puedan votar.'))
     : st === 'open' ? 'Abierta desde: ' + fecha(config.openedAt) : 'Cerrada: ' + fecha(config.closedAt) + '. Puedes reabrirla si fue un error.';
   $('btnOpen').disabled = !(st === 'setup' && config.candidates.length && padron.length && !urna.length);
   $('btnClose').disabled = st !== 'open'; $('btnClose2').disabled = st !== 'open';
@@ -418,7 +426,7 @@ const saveCfg = patch => setDoc(cfgRef, patch, { merge: true }).catch(errH);
 $('instFile').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { newInsignia = await img2url(f, 240); renderAdmin(); } catch { alert('No se pudo leer la imagen.'); } };
 $('btnInstClear').onclick = () => { newInsignia = ''; $('instFile').value = ''; renderAdmin(); };
 $('btnSaveInst').onclick = async () => {
-  const p = { institucion: $('instInput').value.trim() };
+  const p = { institucion: $('instInput').value.trim(), comite: { presidente: $('comPres').value.trim(), secretario: $('comSec').value.trim(), vocal: $('comVoc').value.trim() } };
   if (newInsignia !== null) p.insignia = newInsignia;
   await saveCfg(p); newInsignia = null; $('instFile').value = '';
 };
@@ -517,20 +525,21 @@ $('btnReset').onclick = async () => {
       const docs = (await getDocs(col)).docs;
       for (let i = 0; i < docs.length; i += 400) { const b = writeBatch(db); docs.slice(i, i + 400).forEach(d => b.delete(d.ref)); await b.commit(); }
     }
-    await setDoc(cfgRef, { institucion: config.institucion || '', insignia: config.insignia || '', status: 'setup', candidates: [], openedAt: null, closedAt: null });
+    await setDoc(cfgRef, { institucion: config.institucion || '', insignia: config.insignia || '', comite: config.comite || {}, status: 'setup', candidates: [], openedAt: null, closedAt: null });
   } catch (e) { errH(e); }
 };
 
 // ---- Actas ----
 const actaRef = () => 'ACTA ' + EID.toUpperCase() + '-' + new Date().getFullYear() + '-ME';
-const firmas = '<div class="firmas"><div>Presidente(a) del Comité Electoral</div><div>Asesor(a) o docente responsable</div></div>';
+const firmas = () => { const c = config.comite || {}; return '<div class="firmas">' + [['Presidente(a)', c.presidente], ['Secretario(a)', c.secretario], ['Vocal', c.vocal]].map(([r, n]) => `<div><b>${esc(n || '')}</b><br>${r}</div>`).join('') + '</div>'; };
+const comiteLinea = () => { const c = config.comite || {}; return (c.presidente || c.secretario || c.vocal) ? `<p><strong>Comité electoral:</strong> Presidente(a): ${esc(c.presidente || '—')}; Secretario(a): ${esc(c.secretario || '—')}; Vocal: ${esc(c.vocal || '—')}.</p>` : ''; };
 const actaHead = t => `<div class="ref">${esc(actaRef())}</div><div class="head"><div class="seal">${sealHtml()}</div><h2>${t}</h2><div class="sub">${esc(config.institucion || 'Institución educativa')}</div></div>`;
 function buildBorrador(){
   return `<div class="acta">${actaHead('Acta de apertura de la votación')}
   <p>Siendo las <strong>${config.openedAt ? fecha(config.openedAt) : '[pendiente de apertura]'}</strong>, se deja constancia del inicio de la votación del Municipio Escolar, con la siguiente información:</p><hr>
   <p><strong>Estudiantes hábiles para votar:</strong> ${padron.length}</p><p><strong>Listas inscritas:</strong></p>
   <table><thead><tr><th>Lista</th><th>Candidato(a)</th></tr></thead><tbody>${config.candidates.map(x => `<tr><td>${esc(x.lista)}</td><td>${esc(x.name)}</td></tr>`).join('') || '<tr><td colspan="2">Sin listas registradas</td></tr>'}</tbody></table>
-  <p class="small-note">El proceso se realiza de forma virtual, con un voto único por estudiante.</p>${firmas}</div>`;
+  <p class="small-note">El proceso se realiza de forma virtual, con un voto único por estudiante.</p>${comiteLinea()}${firmas()}</div>`;
 }
 function resultText(t){
   if (!t.total) return 'No se emitieron votos.';
@@ -555,7 +564,7 @@ function buildEscrutinio(){
   <div class="stats">${[[hab, 'Estudiantes hábiles'], [t.total, 'Votos emitidos'], [pct(t.total, hab) + '%', 'Participación']].map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('')}</div>
   <div style="margin:18px 0 6px">${chart}</div>
   <table><thead><tr><th>Opción</th><th>Votos</th><th>%</th></tr></thead><tbody>${rows.map(([n, v]) => `<tr><td>${esc(n)}</td><td>${v}</td><td>${pct(v, t.total)}%</td></tr>`).join('')}</tbody></table><hr>
-  <p><strong>Resultado:</strong> ${config.status === 'closed' ? resultText(t) : 'La votación sigue abierta: estas cifras son parciales y no son definitivas. Cierra la votación para generar el acta oficial.'}</p>${firmas}</div>`;
+  <p><strong>Resultado:</strong> ${config.status === 'closed' ? resultText(t) : 'La votación sigue abierta: estas cifras son parciales y no son definitivas. Cierra la votación para generar el acta oficial.'}</p>${comiteLinea()}${firmas()}</div>`;
 }
 const showActa = html => { $('actaBox').innerHTML = html; $('printRow').classList.remove('hidden'); };
 $('btnBorrador').onclick = () => showActa(buildBorrador());
